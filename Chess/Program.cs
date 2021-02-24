@@ -28,15 +28,25 @@ class Program
             DrawBoard(Board, boardOffset);
             if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON))
             {
-
                 // Move piece if legal move
-                if (CheckMousePos(Board, boardOffset).legalMove == true)
+                try
                 {
-                    Board = MovePiece(selectedPiece, Board, CheckMousePos(Board, boardOffset));
+                    if (CheckMousePos(Board, boardOffset).legalMove == true)
+                    {
+                        Board = MovePiece(selectedPiece, Board, CheckMousePos(Board, boardOffset));
+                        currentPlayer = NextPlayer(currentPlayer);
+                    }
+                    else
+                    {
+                        selectedPiece = CheckMousePos(Board, boardOffset);
+                    }
+
+                    //Check and mark legal moves
+                    MoveConditions.CurrentLegalMoves(selectedPiece, Board, currentPlayer);
                 }
-                else
+                catch (System.Exception)
                 {
-                    selectedPiece = CheckMousePos(Board, boardOffset);
+                    Console.WriteLine("Clicked outside of board");
                 }
 
 
@@ -44,13 +54,11 @@ class Program
                 // {
                 //     Console.WriteLine(selectedPiece.pieceType + " " + selectedPiece.player);
                 // }
-                MoveConditions.CurrentLegalMoves(selectedPiece, Board, currentPlayer);
 
             }
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_A))
             {
-                if (currentPlayer == 1) currentPlayer = 2;
-                else currentPlayer = 1;
+                currentPlayer = NextPlayer(currentPlayer);
             }
 
             Raylib.EndDrawing();
@@ -58,22 +66,27 @@ class Program
     }
     static Piece[,] MovePiece(Piece selectedPiece, Piece[,] Board, Piece newPos)
     {
-        Console.WriteLine("\n" + newPos.pieceType);
+        Console.WriteLine("\n" + newPos.pieceType + " " + newPos.player);
         if (newPos.player != selectedPiece.player && newPos.player != 0)
         {
             eliminatedPieced.Add(newPos);
-            Console.WriteLine();
+            Console.WriteLine("Killed pieces: ");
             for (int i = 0; i < eliminatedPieced.Count; i++)
             {
                 Console.Write(eliminatedPieced[i].pieceType + ", ");
             }
         }
 
+
         Board[newPos.x, newPos.y].player = selectedPiece.player;
         Board[newPos.x, newPos.y].pieceType = selectedPiece.pieceType;
 
+        // Console.WriteLine("\n" + selectedPiece.x + " " + selectedPiece.y);
+        // Console.WriteLine("\n" + newPos.x + " " + newPos.y);
+
         Board[selectedPiece.x, selectedPiece.y].pieceType = PieceType.None;
         Board[selectedPiece.x, selectedPiece.y].player = 0;
+
 
         return Board;
     }
@@ -97,7 +110,7 @@ class Program
     }
     static void DrawBoard(Piece[,] Board, int boardOffset)
     {
-        //Draw lines
+        //Draw checker board
         int boardPixelSize = Raylib.GetScreenHeight() - boardOffset * 2;
         for (int x = 0; x < Board.GetLength(0); x++)
         {
@@ -188,7 +201,13 @@ class Program
         }
         return Board;
     }
-    public void LoadTextures()
+    static int NextPlayer(int currentPlayer)
+    {
+        if (currentPlayer == 1) currentPlayer = 2;
+        else currentPlayer = 1;
+        return currentPlayer;
+    }
+    static void LoadTextures()
     {
         // Image test = LoadImage("resources/raylib_logo.png");     // Loaded in CPU memory (RAM)
         // Texture2D texture = LoadTextureFromImage(image);
