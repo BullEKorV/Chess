@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Raylib_cs;
 class Program
 {
-    public static List<Piece> eliminatedPieced = new List<Piece>();
     static void Main(string[] args)
     {
         //Initialize board
@@ -17,6 +16,7 @@ class Program
         Piece selectedPiece = null;
         int currentPlayer = 1;
 
+        List<Piece> eliminatedPieces = new List<Piece>();
 
         //Run game
         bool gameActive = true;
@@ -33,7 +33,8 @@ class Program
                 {
                     if (CheckMousePos(Board, boardOffset).legalMove == true)
                     {
-                        Board = MovePiece(selectedPiece, Board, CheckMousePos(Board, boardOffset));
+                        Board = MovePiece(selectedPiece, Board, CheckMousePos(Board, boardOffset), eliminatedPieces, currentPlayer);
+
                         currentPlayer = NextPlayer(currentPlayer);
                     }
                     else
@@ -43,18 +44,12 @@ class Program
 
                     //Check and mark legal moves
                     MoveConditions.CurrentLegalMoves(selectedPiece, Board, currentPlayer);
+
                 }
                 catch (System.Exception)
                 {
-                    Console.WriteLine("Clicked outside of board");
+                    Console.WriteLine("Something went wrong");
                 }
-
-
-                // if (CheckMousePos(Board, boardOffset).pieceType != PieceType.None)
-                // {
-                //     Console.WriteLine(selectedPiece.pieceType + " " + selectedPiece.player);
-                // }
-
             }
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_A))
             {
@@ -64,16 +59,18 @@ class Program
             Raylib.EndDrawing();
         }
     }
-    static Piece[,] MovePiece(Piece selectedPiece, Piece[,] Board, Piece newPos)
+    static Piece[,] MovePiece(Piece selectedPiece, Piece[,] Board, Piece newPos, List<Piece> eliminatedPieces, int currentPlayer)
     {
-        Console.WriteLine("\n" + newPos.pieceType + " " + newPos.player);
+        // Console.WriteLine("\n" + newPos.pieceType + " " + newPos.player);
         if (newPos.player != selectedPiece.player && newPos.player != 0)
         {
-            eliminatedPieced.Add(newPos);
+            eliminatedPieces.Add(new Piece(newPos.player, newPos.x, newPos.y, newPos.pieceType, newPos.legalMove)); // Work
+            // eliminatedPieces.Add(newPos); // Why not work?
+
             Console.WriteLine("Killed pieces: ");
-            for (int i = 0; i < eliminatedPieced.Count; i++)
+            for (int i = 0; i < eliminatedPieces.Count; i++)
             {
-                Console.Write(eliminatedPieced[i].pieceType + ", ");
+                Console.Write(eliminatedPieces[i].pieceType + " " + eliminatedPieces[i].player + ", ");
             }
         }
 
@@ -81,12 +78,10 @@ class Program
         Board[newPos.x, newPos.y].player = selectedPiece.player;
         Board[newPos.x, newPos.y].pieceType = selectedPiece.pieceType;
 
-        // Console.WriteLine("\n" + selectedPiece.x + " " + selectedPiece.y);
-        // Console.WriteLine("\n" + newPos.x + " " + newPos.y);
-
         Board[selectedPiece.x, selectedPiece.y].pieceType = PieceType.None;
         Board[selectedPiece.x, selectedPiece.y].player = 0;
 
+        Board = MoveConditions.SpecialPieceConditions(newPos, currentPlayer, Board);
 
         return Board;
     }
@@ -170,7 +165,7 @@ class Program
                 int player = 0;
                 if (y == 0)
                 {
-                    player = 1;
+                    player = 2;
                     if (x == 0 || x == 7) tempType = PieceType.Rook;
                     else if (x == 1 || x == 6) tempType = PieceType.Knight;
                     else if (x == 2 || x == 5) tempType = PieceType.Bishop;
@@ -180,20 +175,20 @@ class Program
                 else if (y == 1)
                 {
                     tempType = PieceType.Pawn;
-                    player = 1;
+                    player = 2;
                 }
                 if (y == 7)
                 {
-                    player = 2;
+                    player = 1;
                     if (x == 0 || x == 7) tempType = PieceType.Rook;
                     else if (x == 1 || x == 6) tempType = PieceType.Knight;
                     else if (x == 2 || x == 5) tempType = PieceType.Bishop;
-                    else if (x == 3) tempType = PieceType.King;
-                    else if (x == 4) tempType = PieceType.Queen;
+                    else if (x == 3) tempType = PieceType.Queen;
+                    else if (x == 4) tempType = PieceType.King;
                 }
                 else if (y == 6)
                 {
-                    player = 2;
+                    player = 1;
                     tempType = PieceType.Pawn;
                 }
                 Board[x, y] = new Piece(player, x, y, tempType, false);
