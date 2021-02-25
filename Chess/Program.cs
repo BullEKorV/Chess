@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Raylib_cs;
+using System.Numerics;
 class Program
 {
     static void Main(string[] args)
@@ -18,6 +19,8 @@ class Program
 
         List<Piece> eliminatedPieces = new List<Piece>();
 
+        Dictionary<String, Texture2D> Textures = LoadTextures();
+
         //Run game
         bool gameActive = true;
         while (gameActive)
@@ -25,7 +28,7 @@ class Program
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.WHITE);
 
-            DrawBoard(Board, boardOffset);
+            DrawBoard(Board, boardOffset, Textures);
             if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON))
             {
                 // Move piece if legal move
@@ -44,7 +47,6 @@ class Program
 
                     //Check and mark legal moves
                     MoveConditions.CurrentLegalMoves(selectedPiece, Board, currentPlayer);
-
                 }
                 catch (System.Exception)
                 {
@@ -65,7 +67,6 @@ class Program
         if (newPos.player != selectedPiece.player && newPos.player != 0)
         {
             eliminatedPieces.Add(new Piece(newPos.player, newPos.x, newPos.y, newPos.pieceType, newPos.legalMove)); // Work
-            // eliminatedPieces.Add(newPos); // Why not work?
 
             Console.WriteLine("Killed pieces: ");
             for (int i = 0; i < eliminatedPieces.Count; i++)
@@ -103,7 +104,7 @@ class Program
         }
         return null;
     }
-    static void DrawBoard(Piece[,] Board, int boardOffset)
+    static void DrawBoard(Piece[,] Board, int boardOffset, Dictionary<String, Texture2D> Textures)
     {
         //Draw checker board
         int boardPixelSize = Raylib.GetScreenHeight() - boardOffset * 2;
@@ -113,8 +114,10 @@ class Program
             {
                 if ((x + y) % 2 != 0)
                 {
-                    Raylib.DrawRectangle(boardOffset + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.BLACK);
+                    Raylib.DrawRectangle(boardOffset + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.DARKBROWN);
                 }
+                else
+                    Raylib.DrawRectangle(boardOffset + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.BEIGE);
                 if (Board[x, y].legalMove == true)
                 {
                     Raylib.DrawRectangle(boardOffset + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.GREEN);
@@ -129,31 +132,28 @@ class Program
             {
                 if (Board[x, y].pieceType != PieceType.None)
                 {
-                    string pieceText = Board[x, y].pieceType.ToString();
-                    var color = Color.BLUE;
-                    if (Board[x, y].player == 1) color = Color.BEIGE;
-                    else if (Board[x, y].player == 2) color = Color.GRAY;
-                    Raylib.DrawText(pieceText.ToString(), boardOffset + x * (boardPixelSize / 8) + x, boardOffset + y * (boardPixelSize / 8) + y, 25, color);
+                    // string pieceText = Board[x, y].pieceType.ToString();
+                    // var color = Color.BLUE;
+                    // if (Board[x, y].player == 1) color = Color.BEIGE;
+                    // else if (Board[x, y].player == 2) color = Color.GRAY;
+                    // Raylib.DrawText(pieceText.ToString(), boardOffset + x * (boardPixelSize / 8) + x, boardOffset + y * (boardPixelSize / 8) + y, 25, color);
+
+                    string fileName = "";
+                    if (Board[x, y].pieceType != PieceType.Knight)
+                        fileName += Board[x, y].pieceType.ToString().ToLower()[0];
+                    else
+                        fileName += "n";
+
+                    if (Board[x, y].player == 1)
+                        fileName += "l";
+                    else
+                        fileName += "d";
+
+                    // Raylib.DrawTexture(Textures[fileName], boardOffset + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), Color.WHITE);
+                    Raylib.DrawTextureEx(Textures[fileName], new Vector2(boardOffset + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8)), 0, (float)0.12, Color.WHITE);
                 }
             }
         }
-        // for (int x = 0; x < Board.GetLength(0); x++)
-        // {
-        //     for (int y = 0; y < Board.GetLength(1); y++)
-        //     {
-        //         int spaceTillEdge = 0;
-        //         if (x > y)
-        //         {
-        //             spaceTillEdge = (Board.GetLength(0) - x) - 1;
-        //         }
-        //         else
-        //         {
-        //             spaceTillEdge = (Board.GetLength(0) - y) - 1;
-        //         }
-
-        //         Raylib.DrawText(spaceTillEdge.ToString(), boardOffset + x * (boardPixelSize / 8) + x, boardOffset + y * (boardPixelSize / 8) + y, 25, Color.BLUE);
-        //     }
-        // }
     }
     static Piece[,] GenerateBoard(Piece[,] Board)
     {
@@ -202,10 +202,23 @@ class Program
         else currentPlayer = 1;
         return currentPlayer;
     }
-    static void LoadTextures()
+    static Dictionary<String, Texture2D> LoadTextures()
     {
-        // Image test = LoadImage("resources/raylib_logo.png");     // Loaded in CPU memory (RAM)
-        // Texture2D texture = LoadTextureFromImage(image);
+        Dictionary<String, Texture2D> Textures = new Dictionary<string, Texture2D>();
+        Textures.Add("kd", Raylib.LoadTexture("ChessPieces/kd.png")); // Black king
+        Textures.Add("kl", Raylib.LoadTexture("ChessPieces/kl.png")); // White king
+        Textures.Add("qd", Raylib.LoadTexture("ChessPieces/qd.png")); // Black queen
+        Textures.Add("ql", Raylib.LoadTexture("ChessPieces/ql.png")); // White king
+        Textures.Add("bd", Raylib.LoadTexture("ChessPieces/bd.png")); // Black bishop
+        Textures.Add("bl", Raylib.LoadTexture("ChessPieces/bl.png")); // White bishop
+        Textures.Add("nd", Raylib.LoadTexture("ChessPieces/nd.png")); // Black knight
+        Textures.Add("nl", Raylib.LoadTexture("ChessPieces/nl.png")); // White knight
+        Textures.Add("rd", Raylib.LoadTexture("ChessPieces/rd.png")); // Black rook
+        Textures.Add("rl", Raylib.LoadTexture("ChessPieces/rl.png")); // White rook
+        Textures.Add("pd", Raylib.LoadTexture("ChessPieces/pd.png")); // Black pawn
+        Textures.Add("pl", Raylib.LoadTexture("ChessPieces/pl.png")); // White pawn
+
+        return Textures;
     }
 }
 

@@ -51,47 +51,34 @@ public class MoveConditions
 
     static void KingCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board)
     {
+
         int opponentPlayer = 0;
         if (currentPlayer == 1) opponentPlayer = 2;
         else opponentPlayer = 1;
 
+        for (int x = 0; x < Board.GetLength(0); x++)
+        {
+            for (int y = 0; y < Board.GetLength(1); y++)
+            {
+                if (Board[x, y].player == opponentPlayer && Board[x, y].pieceType != PieceType.King)
+                {
+                    CurrentLegalMoves(selectedPiece, Board, Board[x, y].player);
+                }
+            }
+        }
+
         if (currentPlayer == selectedPiece.player)
         {
-            // Horizontal check
-            // X + conditions
-            if (selectedPiece.x < Board.GetLength(0) - 1)
-                if (Board[selectedPiece.x + 1, selectedPiece.y].player != currentPlayer)
-                    Board[selectedPiece.x + 1, selectedPiece.y].legalMove = true;
-            // X - conditions
-            if (selectedPiece.x > 0)
-                if (Board[selectedPiece.x - 1, selectedPiece.y].player != currentPlayer)
-                    Board[selectedPiece.x - 1, selectedPiece.y].legalMove = true;
-            // Y + conditions
-            if (selectedPiece.y < Board.GetLength(1) - 1)
-                if (Board[selectedPiece.x, selectedPiece.y + 1].player != currentPlayer)
-                    Board[selectedPiece.x, selectedPiece.y + 1].legalMove = true;
-            // Y - conditions
-            if (selectedPiece.y > 0)
-                if (Board[selectedPiece.x, selectedPiece.y - 1].player != currentPlayer)
-                    Board[selectedPiece.x, selectedPiece.y - 1].legalMove = true;
-
-            // Diagonal Check
-            // X+ Y+ conditions
-            if (selectedPiece.x < Board.GetLength(0) - 1 && selectedPiece.y < Board.GetLength(1) - 1)
-                if (Board[selectedPiece.x + 1, selectedPiece.y + 1].player != currentPlayer)
-                    Board[selectedPiece.x + 1, selectedPiece.y + 1].legalMove = true;
-            // X- Y+ - conditions
-            if (selectedPiece.x > 0 && selectedPiece.y < Board.GetLength(1) - 1)
-                if (Board[selectedPiece.x - 1, selectedPiece.y + 1].player != currentPlayer)
-                    Board[selectedPiece.x - 1, selectedPiece.y + 1].legalMove = true;
-            // X+ Y- + conditions
-            if (selectedPiece.x < Board.GetLength(0) - 1 && selectedPiece.y > 0)
-                if (Board[selectedPiece.x + 1, selectedPiece.y - 1].player != currentPlayer)
-                    Board[selectedPiece.x + 1, selectedPiece.y - 1].legalMove = true;
-            // X- Y+ - conditions
-            if (selectedPiece.x > 0 && selectedPiece.y > 0)
-                if (Board[selectedPiece.x - 1, selectedPiece.y - 1].player != currentPlayer)
-                    Board[selectedPiece.x - 1, selectedPiece.y - 1].legalMove = true;
+            for (int x = -1; x <= 1; x++)
+            {
+                for (int y = -1; y <= 1; y++)
+                {
+                    if (selectedPiece.x + x >= 0 && selectedPiece.y + y >= 0
+                    && selectedPiece.x + x < Board.GetLength(0) && selectedPiece.y + y < Board.GetLength(1))
+                        if (Board[selectedPiece.x + x, selectedPiece.y + y].player != currentPlayer)
+                            Board[selectedPiece.x + x, selectedPiece.y + y].legalMove = true;
+                }
+            }
         }
     }
     static void HorizontalCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board)
