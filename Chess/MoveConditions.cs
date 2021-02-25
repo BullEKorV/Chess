@@ -2,9 +2,8 @@ using System;
 
 public class MoveConditions
 {
-    public static Piece[,] CurrentLegalMoves(Piece selectedPiece, Piece[,] Board, int currentPlayer)
+    public static void CleanLegalMoves(Piece[,] Board)
     {
-        Console.WriteLine(currentPlayer + " " + selectedPiece.pieceType);
         for (int x = 0; x < Board.GetLength(0); x++)
         {
             for (int y = 0; y < Board.GetLength(1); y++)
@@ -12,27 +11,38 @@ public class MoveConditions
                 Board[x, y].legalMove = false;
             }
         }
+    }
+    public static Piece[,] CurrentLegalMoves(Piece selectedPiece, Piece[,] Board, int currentPlayer, bool enableMove)
+    {
+        Console.WriteLine(currentPlayer + " " + selectedPiece.pieceType);
+        // for (int x = 0; x < Board.GetLength(0); x++)
+        // {
+        //     for (int y = 0; y < Board.GetLength(1); y++)
+        //     {
+        //         Board[x, y].legalMove = false;
+        //     }
+        // }
         switch (selectedPiece.pieceType)
         {
             // Rook moving conditions
             case PieceType.King: // King move conditions
-                KingCheck(selectedPiece, currentPlayer, Board);
+                KingCheck(selectedPiece, currentPlayer, Board, enableMove);
                 break;
             case PieceType.Queen: // Queen move conditions
-                HorizontalCheck(selectedPiece, currentPlayer, Board);
-                DiagonalCheck(selectedPiece, currentPlayer, Board);
+                HorizontalCheck(selectedPiece, currentPlayer, Board, enableMove);
+                DiagonalCheck(selectedPiece, currentPlayer, Board, enableMove);
                 break;
             case PieceType.Rook: // Rook move conditions
-                HorizontalCheck(selectedPiece, currentPlayer, Board);
+                HorizontalCheck(selectedPiece, currentPlayer, Board, enableMove);
                 break;
             case PieceType.Bishop: // Bishop move conditions
-                DiagonalCheck(selectedPiece, currentPlayer, Board);
+                DiagonalCheck(selectedPiece, currentPlayer, Board, enableMove);
                 break;
             case PieceType.Knight: // Knight move conditions
-                HorseCheck(selectedPiece, currentPlayer, Board);
+                HorseCheck(selectedPiece, currentPlayer, Board, enableMove);
                 break;
             case PieceType.Pawn: // Pawn move conditions
-                PawnCheck(selectedPiece, currentPlayer, Board);
+                PawnCheck(selectedPiece, currentPlayer, Board, enableMove);
                 break;
             default:
                 break;
@@ -49,23 +59,12 @@ public class MoveConditions
         return Board;
     }
 
-    static void KingCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board)
+    static void KingCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board, bool enableMove)
     {
 
         int opponentPlayer = 0;
         if (currentPlayer == 1) opponentPlayer = 2;
         else opponentPlayer = 1;
-
-        for (int x = 0; x < Board.GetLength(0); x++)
-        {
-            for (int y = 0; y < Board.GetLength(1); y++)
-            {
-                if (Board[x, y].player == opponentPlayer && Board[x, y].pieceType != PieceType.King)
-                {
-                    CurrentLegalMoves(selectedPiece, Board, Board[x, y].player);
-                }
-            }
-        }
 
         if (currentPlayer == selectedPiece.player)
         {
@@ -76,12 +75,25 @@ public class MoveConditions
                     if (selectedPiece.x + x >= 0 && selectedPiece.y + y >= 0
                     && selectedPiece.x + x < Board.GetLength(0) && selectedPiece.y + y < Board.GetLength(1))
                         if (Board[selectedPiece.x + x, selectedPiece.y + y].player != currentPlayer)
-                            Board[selectedPiece.x + x, selectedPiece.y + y].legalMove = true;
+                            Board[selectedPiece.x + x, selectedPiece.y + y].legalMove = enableMove;
+                }
+            }
+
+            // Check if legal move is dangerous
+            for (int x = 0; x < Board.GetLength(0); x++)
+            {
+                for (int y = 0; y < Board.GetLength(1); y++)
+                {
+                    if (Board[x, y].player == opponentPlayer && Board[x, y].pieceType != PieceType.King)
+                    {
+                        CurrentLegalMoves(Board[x, y], Board, Board[x, y].player, false);
+                    }
                 }
             }
         }
+
     }
-    static void HorizontalCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board)
+    static void HorizontalCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board, bool enableMove)
     {
         int opponentPlayer = 0;
         if (currentPlayer == 1) opponentPlayer = 2;
@@ -92,32 +104,32 @@ public class MoveConditions
             // X conditions
             for (int i = selectedPiece.x + 1; i < Board.GetLength(0); i++)
             {
-                if (Board[i, selectedPiece.y].player == currentPlayer) break;
-                Board[i, selectedPiece.y].legalMove = true;
-                if (Board[i, selectedPiece.y].player == opponentPlayer) break;
+                if (Board[i, selectedPiece.y].player == currentPlayer && enableMove == true) break;
+                Board[i, selectedPiece.y].legalMove = enableMove;
+                if (Board[i, selectedPiece.y].player == opponentPlayer || Board[i, selectedPiece.y].player == currentPlayer) break;
             }
             for (int i = selectedPiece.x - 1; i >= 0; i--)
             {
-                if (Board[i, selectedPiece.y].player == currentPlayer) break;
-                Board[i, selectedPiece.y].legalMove = true;
-                if (Board[i, selectedPiece.y].player == opponentPlayer) break;
+                if (Board[i, selectedPiece.y].player == currentPlayer && enableMove == true) break;
+                Board[i, selectedPiece.y].legalMove = enableMove;
+                if (Board[i, selectedPiece.y].player == opponentPlayer || Board[i, selectedPiece.y].player == currentPlayer) break;
             }
             // Y conditions
             for (int i = selectedPiece.y + 1; i < Board.GetLength(1); i++)
             {
-                if (Board[selectedPiece.x, i].player == currentPlayer) break;
-                Board[selectedPiece.x, i].legalMove = true;
-                if (Board[selectedPiece.x, i].player == opponentPlayer) break;
+                if (Board[selectedPiece.x, i].player == currentPlayer && enableMove == true) break;
+                Board[selectedPiece.x, i].legalMove = enableMove;
+                if (Board[selectedPiece.x, i].player == opponentPlayer || Board[selectedPiece.x, i].player == currentPlayer) break;
             }
             for (int i = selectedPiece.y - 1; i >= 0; i--)
             {
-                if (Board[selectedPiece.x, i].player == currentPlayer) break;
-                Board[selectedPiece.x, i].legalMove = true;
-                if (Board[selectedPiece.x, i].player == opponentPlayer) break;
+                if (Board[selectedPiece.x, i].player == currentPlayer && enableMove == true) break;
+                Board[selectedPiece.x, i].legalMove = enableMove;
+                if (Board[selectedPiece.x, i].player == opponentPlayer || Board[selectedPiece.x, i].player == currentPlayer) break;
             }
         }
     }
-    static void DiagonalCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board)
+    static void DiagonalCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board, bool enableMove)
     {
         int opponentPlayer = 0;
         if (currentPlayer == 1) opponentPlayer = 2;
@@ -129,18 +141,18 @@ public class MoveConditions
             {
                 if (selectedPiece.x + i >= Board.GetLength(0) || selectedPiece.y + i >= Board.GetLength(1)) break;
                 // Console.WriteLine("++");
-                if (Board[selectedPiece.x + i, selectedPiece.y + i].player == currentPlayer) break;
-                Board[selectedPiece.x + i, selectedPiece.y + i].legalMove = true;
-                if (Board[selectedPiece.x + i, selectedPiece.y + i].player == opponentPlayer) break;
+                if (Board[selectedPiece.x + i, selectedPiece.y + i].player == currentPlayer && enableMove == true) break;
+                Board[selectedPiece.x + i, selectedPiece.y + i].legalMove = enableMove;
+                if (Board[selectedPiece.x + i, selectedPiece.y + i].player == opponentPlayer || Board[selectedPiece.x + i, selectedPiece.y + i].player == currentPlayer) break;
             }
 
             for (int i = 1; i < Board.GetLength(0); i++) // X- Y+ conditions
             {
                 if (selectedPiece.x - i < 0 || selectedPiece.y + i >= Board.GetLength(1)) break;
                 // Console.WriteLine("-+");
-                if (Board[selectedPiece.x - i, selectedPiece.y + i].player == currentPlayer) break;
-                Board[selectedPiece.x - i, selectedPiece.y + i].legalMove = true;
-                if (Board[selectedPiece.x - i, selectedPiece.y + i].player == opponentPlayer) break;
+                if (Board[selectedPiece.x - i, selectedPiece.y + i].player == currentPlayer && enableMove == true) break;
+                Board[selectedPiece.x - i, selectedPiece.y + i].legalMove = enableMove;
+                if (Board[selectedPiece.x - i, selectedPiece.y + i].player == opponentPlayer || Board[selectedPiece.x - i, selectedPiece.y + i].player == currentPlayer) break;
             }
 
             // Y conditions
@@ -148,21 +160,21 @@ public class MoveConditions
             {
                 if (selectedPiece.x + i >= Board.GetLength(0) || selectedPiece.y - i < 0) break;
                 // Console.WriteLine("+-");
-                if (Board[selectedPiece.x + i, selectedPiece.y - i].player == currentPlayer) break;
-                Board[selectedPiece.x + i, selectedPiece.y - i].legalMove = true;
-                if (Board[selectedPiece.x + i, selectedPiece.y - i].player == opponentPlayer) break;
+                if (Board[selectedPiece.x + i, selectedPiece.y - i].player == currentPlayer && enableMove == true) break;
+                Board[selectedPiece.x + i, selectedPiece.y - i].legalMove = enableMove;
+                if (Board[selectedPiece.x + i, selectedPiece.y - i].player == opponentPlayer || Board[selectedPiece.x + i, selectedPiece.y - i].player == currentPlayer) break;
             }
             for (int i = 1; i < Board.GetLength(1); i++) // X- Y- conditions
             {
                 if (selectedPiece.x - i < 0 || selectedPiece.y - i < 0) break;
                 // Console.WriteLine("--");
-                if (Board[selectedPiece.x - i, selectedPiece.y - i].player == currentPlayer) break;
-                Board[selectedPiece.x - i, selectedPiece.y - i].legalMove = true;
-                if (Board[selectedPiece.x - i, selectedPiece.y - i].player == opponentPlayer) break;
+                if (Board[selectedPiece.x - i, selectedPiece.y - i].player == currentPlayer && enableMove == true) break;
+                Board[selectedPiece.x - i, selectedPiece.y - i].legalMove = enableMove;
+                if (Board[selectedPiece.x - i, selectedPiece.y - i].player == opponentPlayer || Board[selectedPiece.x - i, selectedPiece.y - i].player == currentPlayer) break;
             }
         }
     }
-    static void HorseCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board)
+    static void HorseCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board, bool enableMove)
     {
         if (currentPlayer == selectedPiece.player)
         {
@@ -170,44 +182,44 @@ public class MoveConditions
             if (selectedPiece.x >= 1 && selectedPiece.y >= 2)
             {
                 if (Board[selectedPiece.x - 1, selectedPiece.y - 2].player != currentPlayer)
-                    Board[selectedPiece.x - 1, selectedPiece.y - 2].legalMove = true;
+                    Board[selectedPiece.x - 1, selectedPiece.y - 2].legalMove = enableMove;
             }
             if (selectedPiece.x <= Board.GetLength(0) - 2 && selectedPiece.y >= 2)
             {
                 if (Board[selectedPiece.x + 1, selectedPiece.y - 2].player != currentPlayer)
-                    Board[selectedPiece.x + 1, selectedPiece.y - 2].legalMove = true;
+                    Board[selectedPiece.x + 1, selectedPiece.y - 2].legalMove = enableMove;
             }
             if (selectedPiece.x >= 1 && selectedPiece.y <= Board.GetLength(1) - 3)
             {
                 if (Board[selectedPiece.x - 1, selectedPiece.y + 2].player != currentPlayer)
-                    Board[selectedPiece.x - 1, selectedPiece.y + 2].legalMove = true;
+                    Board[selectedPiece.x - 1, selectedPiece.y + 2].legalMove = enableMove;
             }
             if (selectedPiece.x <= Board.GetLength(0) - 2 && selectedPiece.y <= Board.GetLength(1) - 3)
             {
                 if (Board[selectedPiece.x + 1, selectedPiece.y + 2].player != currentPlayer)
-                    Board[selectedPiece.x + 1, selectedPiece.y + 2].legalMove = true;
+                    Board[selectedPiece.x + 1, selectedPiece.y + 2].legalMove = enableMove;
             }
 
             // y +- 1
             if (selectedPiece.x >= 2 && selectedPiece.y >= 1)
             {
                 if (Board[selectedPiece.x - 2, selectedPiece.y - 1].player != currentPlayer)
-                    Board[selectedPiece.x - 2, selectedPiece.y - 1].legalMove = true;
+                    Board[selectedPiece.x - 2, selectedPiece.y - 1].legalMove = enableMove;
             }
             if (selectedPiece.x <= Board.GetLength(0) - 3 && selectedPiece.y >= 1)
             {
                 if (Board[selectedPiece.x + 2, selectedPiece.y - 1].player != currentPlayer)
-                    Board[selectedPiece.x + 2, selectedPiece.y - 1].legalMove = true;
+                    Board[selectedPiece.x + 2, selectedPiece.y - 1].legalMove = enableMove;
             }
             if (selectedPiece.x >= 2 && selectedPiece.y <= Board.GetLength(1) - 2)
             {
                 if (Board[selectedPiece.x - 2, selectedPiece.y + 1].player != currentPlayer)
-                    Board[selectedPiece.x - 2, selectedPiece.y + 1].legalMove = true;
+                    Board[selectedPiece.x - 2, selectedPiece.y + 1].legalMove = enableMove;
             }
             if (selectedPiece.x <= Board.GetLength(0) - 3 && selectedPiece.y <= Board.GetLength(1) - 2)
             {
                 if (Board[selectedPiece.x + 2, selectedPiece.y + 1].player != currentPlayer)
-                    Board[selectedPiece.x + 2, selectedPiece.y + 1].legalMove = true;
+                    Board[selectedPiece.x + 2, selectedPiece.y + 1].legalMove = enableMove;
             }
             // Board[selectedPiece.x - 2, selectedPiece.y - 1].legalMove = true;
             // Board[selectedPiece.x + 2, selectedPiece.y - 1].legalMove = true;
@@ -215,53 +227,53 @@ public class MoveConditions
             // Board[selectedPiece.x + 2, selectedPiece.y + 1].legalMove = true;
         }
     }
-    static void PawnCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board)
+    static void PawnCheck(Piece selectedPiece, int currentPlayer, Piece[,] Board, bool enableMove)
     {
         if (selectedPiece.player == 2 && currentPlayer == 2) //Moving conditions for player 2
         {
-            if (Board[selectedPiece.x, selectedPiece.y + 1].pieceType == PieceType.None)
+            if (Board[selectedPiece.x, selectedPiece.y + 1].pieceType == PieceType.None && enableMove == true)
             {
-                Board[selectedPiece.x, selectedPiece.y + 1].legalMove = true;
+                Board[selectedPiece.x, selectedPiece.y + 1].legalMove = enableMove;
                 if (selectedPiece.y == 1)
                 {
                     if (Board[selectedPiece.x, selectedPiece.y + 2].pieceType == PieceType.None)
                     {
-                        Board[selectedPiece.x, selectedPiece.y + 2].legalMove = true;
+                        Board[selectedPiece.x, selectedPiece.y + 2].legalMove = enableMove;
                     }
                 }
             }
             //Attack diagonally
-            if (selectedPiece.x < Board.GetLength(0) - 1 && Board[selectedPiece.x + 1, selectedPiece.y + 1].player == 1)
+            if (selectedPiece.x < Board.GetLength(0) - 1 && (Board[selectedPiece.x + 1, selectedPiece.y + 1].player == 1 || enableMove == false))
             {
-                Board[selectedPiece.x + 1, selectedPiece.y + 1].legalMove = true;
+                Board[selectedPiece.x + 1, selectedPiece.y + 1].legalMove = enableMove;
             }
-            if (selectedPiece.x > 0 && Board[selectedPiece.x - 1, selectedPiece.y + 1].player == 1)
+            if (selectedPiece.x > 0 && (Board[selectedPiece.x - 1, selectedPiece.y + 1].player == 1 || enableMove == false))
             {
-                Board[selectedPiece.x - 1, selectedPiece.y + 1].legalMove = true;
+                Board[selectedPiece.x - 1, selectedPiece.y + 1].legalMove = enableMove;
             }
         }
         // Moving conditions for player 1
         else if (selectedPiece.player == 1 && currentPlayer == 1)
         {
-            if (Board[selectedPiece.x, selectedPiece.y - 1].pieceType == PieceType.None)
+            if (Board[selectedPiece.x, selectedPiece.y - 1].pieceType == PieceType.None && enableMove == true)
             {
-                Board[selectedPiece.x, selectedPiece.y - 1].legalMove = true;
+                Board[selectedPiece.x, selectedPiece.y - 1].legalMove = enableMove;
                 if (selectedPiece.y == 6)
                 {
                     if (Board[selectedPiece.x, selectedPiece.y - 2].pieceType == PieceType.None)
                     {
-                        Board[selectedPiece.x, selectedPiece.y - 2].legalMove = true;
+                        Board[selectedPiece.x, selectedPiece.y - 2].legalMove = enableMove;
                     }
                 }
             }
             // Attack diagonally
-            if (selectedPiece.x < Board.GetLength(0) - 1 && Board[selectedPiece.x + 1, selectedPiece.y - 1].player == 2)
+            if (selectedPiece.x < Board.GetLength(0) - 1 && (Board[selectedPiece.x + 1, selectedPiece.y - 1].player == 2 || enableMove == false))
             {
-                Board[selectedPiece.x + 1, selectedPiece.y - 1].legalMove = true;
+                Board[selectedPiece.x + 1, selectedPiece.y - 1].legalMove = enableMove;
             }
-            if (selectedPiece.x > 0 && Board[selectedPiece.x - 1, selectedPiece.y - 1].player == 2)
+            if (selectedPiece.x > 0 && (Board[selectedPiece.x - 1, selectedPiece.y - 1].player == 2 || enableMove == false))
             {
-                Board[selectedPiece.x - 1, selectedPiece.y - 1].legalMove = true;
+                Board[selectedPiece.x - 1, selectedPiece.y - 1].legalMove = enableMove;
             }
         }
     }

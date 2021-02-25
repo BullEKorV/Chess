@@ -10,7 +10,8 @@ class Program
         Piece[,] Board = new Piece[8, 8];
         Board = GenerateBoard(Board);
 
-        Raylib.InitWindow(1000, 1000, "Chess");
+        Raylib.InitWindow(1920, 1080, "Chess");
+        // Raylib.ToggleFullscreen();
         Raylib.SetTargetFPS(120);
 
         int boardOffset = 100;
@@ -46,7 +47,8 @@ class Program
                     }
 
                     //Check and mark legal moves
-                    MoveConditions.CurrentLegalMoves(selectedPiece, Board, currentPlayer);
+                    MoveConditions.CleanLegalMoves(Board);
+                    MoveConditions.CurrentLegalMoves(selectedPiece, Board, currentPlayer, true);
                 }
                 catch (System.Exception)
                 {
@@ -94,8 +96,8 @@ class Program
             for (int y = 0; y < Board.GetLength(1); y++)
             {
                 {
-                    if (Raylib.GetMouseX() >= boardOffset + x * (boardPixelSize / 8) && Raylib.GetMouseY() >= boardOffset + y * (boardPixelSize / 8)
-                    && Raylib.GetMouseX() < boardOffset + x * (boardPixelSize / 8) + boardPixelSize / 8 && Raylib.GetMouseY() < boardOffset + y * (boardPixelSize / 8) + boardPixelSize / 8)
+                    if (Raylib.GetMouseX() >= (Raylib.GetScreenWidth() - boardPixelSize) / 2 + x * (boardPixelSize / 8) && Raylib.GetMouseY() >= boardOffset + y * (boardPixelSize / 8)
+                    && Raylib.GetMouseX() < (Raylib.GetScreenWidth() - boardPixelSize) / 2 + x * (boardPixelSize / 8) + boardPixelSize / 8 && Raylib.GetMouseY() < boardOffset + y * (boardPixelSize / 8) + boardPixelSize / 8)
                     {
                         return Board[x, y];
                     }
@@ -114,13 +116,13 @@ class Program
             {
                 if ((x + y) % 2 != 0)
                 {
-                    Raylib.DrawRectangle(boardOffset + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.DARKBROWN);
+                    Raylib.DrawRectangle((Raylib.GetScreenWidth() - boardPixelSize) / 2 + (x * (boardPixelSize / 8)), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.DARKBROWN);
                 }
                 else
-                    Raylib.DrawRectangle(boardOffset + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.BEIGE);
+                    Raylib.DrawRectangle((Raylib.GetScreenWidth() - boardPixelSize) / 2 + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.BEIGE);
                 if (Board[x, y].legalMove == true)
                 {
-                    Raylib.DrawRectangle(boardOffset + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.GREEN);
+                    Raylib.DrawRectangle((Raylib.GetScreenWidth() - boardPixelSize) / 2 + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.GREEN);
                 }
             }
         }
@@ -149,8 +151,8 @@ class Program
                     else
                         fileName += "d";
 
-                    // Raylib.DrawTexture(Textures[fileName], boardOffset + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), Color.WHITE);
-                    Raylib.DrawTextureEx(Textures[fileName], new Vector2(boardOffset + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8)), 0, (float)0.12, Color.WHITE);
+                    // TO DO // Make size scale with boardPixelSize
+                    Raylib.DrawTextureEx(Textures[fileName], new Vector2((Raylib.GetScreenWidth() - boardPixelSize) / 2 + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8)), 0, (float)0.12, Color.WHITE);
                 }
             }
         }
