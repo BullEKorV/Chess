@@ -125,7 +125,7 @@ public class MoveConditions
             for (int i = selectedPiece.x + 1; i < Board.GetLength(0); i++)
             {
                 if (Board[i, selectedPiece.y].player == currentPlayer && enableMove == true) break;
-                if (Board[i, selectedPiece.y].player == opponentPlayer && enableMove == false && Board[i, selectedPiece.y].pieceType == PieceType.King && selectedPiece.x < Board.GetLength(0) - 2)
+                if (Board[i, selectedPiece.y].player == opponentPlayer && enableMove == false && Board[i, selectedPiece.y].pieceType == PieceType.King && Board[i, selectedPiece.y].x < Board.GetLength(0) - 1)
                     Board[i + 1, selectedPiece.y].legalMove = enableMove; // Make so king can't back up
                 Board[i, selectedPiece.y].legalMove = enableMove;
                 if (Board[i, selectedPiece.y].player == opponentPlayer || Board[i, selectedPiece.y].player == currentPlayer) break;
@@ -133,7 +133,7 @@ public class MoveConditions
             for (int i = selectedPiece.x - 1; i >= 0; i--)
             {
                 if (Board[i, selectedPiece.y].player == currentPlayer && enableMove == true) break;
-                if (Board[i, selectedPiece.y].player == opponentPlayer && enableMove == false && Board[i, selectedPiece.y].pieceType == PieceType.King && selectedPiece.x > 1)
+                if (Board[i, selectedPiece.y].player == opponentPlayer && enableMove == false && Board[i, selectedPiece.y].pieceType == PieceType.King && Board[i, selectedPiece.y].x > 0)
                     Board[i - 1, selectedPiece.y].legalMove = enableMove;// Make so king can't back up
                 Board[i, selectedPiece.y].legalMove = enableMove;
                 if (Board[i, selectedPiece.y].player == opponentPlayer || Board[i, selectedPiece.y].player == currentPlayer) break;
@@ -142,7 +142,7 @@ public class MoveConditions
             for (int i = selectedPiece.y + 1; i < Board.GetLength(1); i++)
             {
                 if (Board[selectedPiece.x, i].player == currentPlayer && enableMove == true) break;
-                if (Board[selectedPiece.x, i].player == opponentPlayer && enableMove == false && Board[selectedPiece.x, i].pieceType == PieceType.King && selectedPiece.y < Board.GetLength(1) - 2)
+                if (Board[selectedPiece.x, i].player == opponentPlayer && enableMove == false && Board[selectedPiece.x, i].pieceType == PieceType.King && Board[selectedPiece.x, i].y < Board.GetLength(1) - 1)
                     Board[selectedPiece.x, i + 1].legalMove = enableMove;// Make so king can't back up
                 Board[selectedPiece.x, i].legalMove = enableMove;
                 if (Board[selectedPiece.x, i].player == opponentPlayer || Board[selectedPiece.x, i].player == currentPlayer) break;
@@ -150,7 +150,7 @@ public class MoveConditions
             for (int i = selectedPiece.y - 1; i >= 0; i--)
             {
                 if (Board[selectedPiece.x, i].player == currentPlayer && enableMove == true) break;
-                if (Board[selectedPiece.x, i].player == opponentPlayer && enableMove == false && Board[selectedPiece.x, i].pieceType == PieceType.King && selectedPiece.y > 1)
+                if (Board[selectedPiece.x, i].player == opponentPlayer && enableMove == false && Board[selectedPiece.x, i].pieceType == PieceType.King && Board[selectedPiece.x, i].y > 0)
                     Board[selectedPiece.x, i - 1].legalMove = enableMove;// Make so king can't back up
                 Board[selectedPiece.x, i].legalMove = enableMove;
                 if (Board[selectedPiece.x, i].player == opponentPlayer || Board[selectedPiece.x, i].player == currentPlayer) break;
@@ -172,7 +172,7 @@ public class MoveConditions
                 if (Board[selectedPiece.x + i, selectedPiece.y + i].player == currentPlayer && enableMove == true) break;
 
                 if (Board[selectedPiece.x + i, selectedPiece.y + i].player == opponentPlayer && enableMove == false && Board[selectedPiece.x + i, selectedPiece.y + i].pieceType == PieceType.King
-                && selectedPiece.x + i + 1 <= Board.GetLength(0) - 1 && selectedPiece.y + i + 1 <= Board.GetLength(1) - 1)
+                && Board[selectedPiece.x + i, selectedPiece.y + i].x + 1 <= Board.GetLength(0) - 1 && Board[selectedPiece.x + i, selectedPiece.y + i].y + 1 <= Board.GetLength(1) - 1)
                     Board[selectedPiece.x + i + 1, selectedPiece.y + i + 1].legalMove = enableMove; // Make so king can't ++
 
                 Board[selectedPiece.x + i, selectedPiece.y + i].legalMove = enableMove;
@@ -186,7 +186,7 @@ public class MoveConditions
                 if (Board[selectedPiece.x - i, selectedPiece.y + i].player == currentPlayer && enableMove == true) break;
 
                 if (Board[selectedPiece.x - i, selectedPiece.y + i].player == opponentPlayer && enableMove == false && Board[selectedPiece.x - i, selectedPiece.y + i].pieceType == PieceType.King
-                && selectedPiece.x - i - 1 >= 0 && selectedPiece.y + i <= Board.GetLength(1) - 1)
+                && Board[selectedPiece.x - i, selectedPiece.y + i].x - 1 >= 0 && Board[selectedPiece.x - i, selectedPiece.y + i].y + 1 <= Board.GetLength(1) - 1)
                     Board[selectedPiece.x - i - 1, selectedPiece.y + i + 1].legalMove = enableMove; // Make so king can't -+
 
                 Board[selectedPiece.x - i, selectedPiece.y + i].legalMove = enableMove;
@@ -201,7 +201,7 @@ public class MoveConditions
                 if (Board[selectedPiece.x + i, selectedPiece.y - i].player == currentPlayer && enableMove == true) break;
 
                 if (Board[selectedPiece.x + i, selectedPiece.y - i].player == opponentPlayer && enableMove == false && Board[selectedPiece.x + i, selectedPiece.y - i].pieceType == PieceType.King
-                && selectedPiece.x + i + 1 <= Board.GetLength(0) - 1 && selectedPiece.y - i - 1 >= 0)
+                && Board[selectedPiece.x + i, selectedPiece.y - i].x + 1 <= Board.GetLength(0) - 1 && Board[selectedPiece.x + i, selectedPiece.y - i].y - 1 >= 0)
                     Board[selectedPiece.x + i + 1, selectedPiece.y - i - 1].legalMove = enableMove; // Make so king can't +-
 
                 Board[selectedPiece.x + i, selectedPiece.y - i].legalMove = enableMove;
@@ -214,7 +214,7 @@ public class MoveConditions
                 if (Board[selectedPiece.x - i, selectedPiece.y - i].player == currentPlayer && enableMove == true) break;
 
                 if (Board[selectedPiece.x - i, selectedPiece.y - i].player == opponentPlayer && enableMove == false && Board[selectedPiece.x - i, selectedPiece.y - i].pieceType == PieceType.King
-                && selectedPiece.x - i - 1 >= 0 && selectedPiece.y - i - 1 >= 0)
+                && Board[selectedPiece.x - i, selectedPiece.y - i].x - 1 >= 0 && Board[selectedPiece.x - i, selectedPiece.y - i].y - 1 >= 0)
                     Board[selectedPiece.x - i - 1, selectedPiece.y - i - 1].legalMove = enableMove; // Make so king can't ++
 
                 Board[selectedPiece.x - i, selectedPiece.y - i].legalMove = enableMove;

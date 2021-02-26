@@ -67,10 +67,10 @@ class Program
                     Console.WriteLine(e.Message);
                 }
             }
-            // if (Raylib.IsKeyPressed(KeyboardKey.KEY_A))
-            // {
-            //     currentPlayer = NextPlayer(currentPlayer);
-            // }
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_A))
+            {
+                currentPlayer = NextPlayer(currentPlayer);
+            }
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_B))
             {
                 if (round > 1)
@@ -169,9 +169,9 @@ class Program
         if (!gameOver)
         {
             if (isChecked[0])
-                Raylib.DrawText("White is in a check", boardOffset, Raylib.GetScreenHeight() / 3, 35, Color.BLACK);
+                Raylib.DrawText("White check!", boardOffset, Raylib.GetScreenHeight() / 3, 35, Color.BLACK);
             else if (isChecked[1])
-                Raylib.DrawText("Black is in a check", boardOffset, Raylib.GetScreenHeight() / 3, 35, Color.BLACK);
+                Raylib.DrawText("Black check", boardOffset, Raylib.GetScreenHeight() / 3, 35, Color.BLACK);
         }
 
         // Draw checkMate message
@@ -191,7 +191,7 @@ class Program
             Raylib.DrawText("Black's turn", boardOffset, boardOffset, 50, Color.BLACK);
 
         // Draw current round
-        Raylib.DrawText("Round " + round, Raylib.GetScreenWidth() - boardPixelSize / 4, boardOffset, 45, Color.BLACK);
+        Raylib.DrawText("Round " + round, Raylib.GetScreenWidth() - boardPixelSize / 3, boardOffset, 45, Color.BLACK);
 
         // Draw letters and numbers around board
         for (int x = 0; x < Board.GetLength(0); x++)
@@ -259,18 +259,24 @@ class Program
                 int player = 0;
                 if (y == 0)
                 {
-                    player = 2;
-                    if (x == 0 || x == 7) tempType = PieceType.Rook;
-                    else if (x == 1 || x == 6) tempType = PieceType.Knight;
-                    else if (x == 2 || x == 5) tempType = PieceType.Bishop;
-                    else if (x == 3) tempType = PieceType.Queen;
-                    else if (x == 4) tempType = PieceType.King;
+                    // player = 2;
+                    // if (x == 0 || x == 7) tempType = PieceType.Rook;
+                    // else if (x == 1 || x == 6) tempType = PieceType.Knight;
+                    // else if (x == 2 || x == 5) tempType = PieceType.Bishop;
+                    // else if (x == 3) tempType = PieceType.Queen;
+                    // else if (x == 4) tempType = PieceType.King;
+                    if (x == 4)
+                    {
+                        tempType = PieceType.King;
+                        player = 2;
+                    }
+
                 }
-                else if (y == 1)
-                {
-                    tempType = PieceType.Pawn;
-                    player = 2;
-                }
+                // else if (y == 1)
+                // {
+                //     tempType = PieceType.Pawn;
+                //     player = 2;
+                // }
                 if (y == Board.GetLength(1) - 1)
                 {
                     player = 1;
