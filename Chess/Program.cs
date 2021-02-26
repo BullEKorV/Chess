@@ -11,7 +11,7 @@ class Program
         Board = GenerateBoard(Board);
 
         Raylib.InitWindow(1920, 1080, "Chess");
-        // Raylib.ToggleFullscreen();
+        Raylib.ToggleFullscreen();
         Raylib.SetTargetFPS(120);
 
         int boardOffset = 100;
@@ -19,11 +19,11 @@ class Program
         int currentPlayer = 1;
         bool[] isChecked = { false, false };
         int round = 1;
+        bool gameOver = false;
 
         bool hintsActivated = true;
 
         List<Piece> allMoves = new List<Piece>();
-        List<Piece> eliminatedPieces = new List<Piece>();
 
         Dictionary<String, Texture2D> Textures = LoadTextures();
 
@@ -34,8 +34,8 @@ class Program
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.WHITE);
 
-            DrawBoard(Board, boardOffset, Textures, isChecked, round, hintsActivated, currentPlayer);
-            if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON))
+            DrawBoard(Board, boardOffset, Textures, isChecked, round, hintsActivated, currentPlayer, gameOver);
+            if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON) && gameOver == false)
             {
                 // Move piece if legal move
                 try
@@ -44,7 +44,7 @@ class Program
                     {
                         isChecked[currentPlayer - 1] = false;
 
-                        Board = MovePiece(selectedPiece, Board, CheckMousePos(Board, boardOffset), eliminatedPieces, currentPlayer, allMoves, round);
+                        Board = MovePiece(selectedPiece, Board, CheckMousePos(Board, boardOffset), currentPlayer, allMoves, round);
 
                         currentPlayer = NextPlayer(currentPlayer);
 
@@ -67,10 +67,10 @@ class Program
                     Console.WriteLine(e.Message);
                 }
             }
-            if (Raylib.IsKeyPressed(KeyboardKey.KEY_A))
-            {
-                currentPlayer = NextPlayer(currentPlayer);
-            }
+            // if (Raylib.IsKeyPressed(KeyboardKey.KEY_A))
+            // {
+            //     currentPlayer = NextPlayer(currentPlayer);
+            // }
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_B))
             {
                 if (round > 1)
@@ -78,15 +78,19 @@ class Program
                     Board = GoBackStep(Board, allMoves);
                     round--;
                     isChecked[currentPlayer - 1] = false;
+                    gameOver = false;
                     currentPlayer = NextPlayer(currentPlayer);
+                    MoveConditions.ClearLegalMoves(Board);
                 }
             }
-            if (Raylib.IsKeyPressed(KeyboardKey.KEY_G))
-            {
-                // It's a checkmate! 
-            }
-            if (Raylib.IsKeyPressed(KeyboardKey.KEY_H))
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_G) && (isChecked[0] || isChecked[1])) // Give up
+                gameOver = true;
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_R)) // Reset game
+                Board = ResetGame(Board, ref currentPlayer, ref round, ref allMoves, ref isChecked, ref gameOver);
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_H)) // Activate or deactivate tips
                 hintsActivated = !hintsActivated;
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_Q)) // Reset game
+                gameActive = false;
 
             Raylib.EndDrawing();
         }
@@ -103,20 +107,8 @@ class Program
 
         return Board;
     }
-    static Piece[,] MovePiece(Piece selectedPiece, Piece[,] Board, Piece newPos, List<Piece> eliminatedPieces, int currentPlayer, List<Piece> allMoves, int round)
+    static Piece[,] MovePiece(Piece selectedPiece, Piece[,] Board, Piece newPos, int currentPlayer, List<Piece> allMoves, int round)
     {
-        if (newPos.player != selectedPiece.player && newPos.player != 0)
-        {
-            if (newPos.pieceType == PieceType.King) Console.WriteLine("Game over");
-            eliminatedPieces.Add(new Piece(newPos.player, newPos.x, newPos.y, newPos.pieceType, newPos.legalMove)); // Work
-
-            // Console.WriteLine("Killed pieces: ");
-            // for (int i = 0; i < eliminatedPieces.Count; i++)
-            // {
-            //     Console.Write(eliminatedPieces[i].pieceType + " " + eliminatedPieces[i].player + ", ");
-            // }
-        }
-
         // Add moves to all registered moves
         allMoves.Add(new Piece(selectedPiece.player, selectedPiece.x, selectedPiece.y, selectedPiece.pieceType, selectedPiece.legalMove));
         allMoves.Add(new Piece(newPos.player, newPos.x, newPos.y, newPos.pieceType, newPos.legalMove));
@@ -152,7 +144,7 @@ class Program
         }
         return null;
     }
-    static void DrawBoard(Piece[,] Board, int boardOffset, Dictionary<String, Texture2D> Textures, bool[] isChecked, int round, bool hintsActivated, int currentPlayer)
+    static void DrawBoard(Piece[,] Board, int boardOffset, Dictionary<String, Texture2D> Textures, bool[] isChecked, int round, bool hintsActivated, int currentPlayer, bool gameOver)
     {
         //Draw checker board
         int boardPixelSize = Raylib.GetScreenHeight() - boardOffset * 2;
@@ -174,19 +166,29 @@ class Program
         }
 
         // Draw check message
-        for (int i = 0; i < isChecked.Length; i++)
+        if (!gameOver)
         {
-            if (isChecked[i] == true)
-            {
-                Raylib.DrawText("Player " + (i + 1) + " check!", boardOffset, boardOffset, 35, Color.BLACK);
-            }
+            if (isChecked[0])
+                Raylib.DrawText("White is in a check", boardOffset, Raylib.GetScreenHeight() / 3, 35, Color.BLACK);
+            else if (isChecked[1])
+                Raylib.DrawText("Black is in a check", boardOffset, Raylib.GetScreenHeight() / 3, 35, Color.BLACK);
         }
+
+        // Draw checkMate message
+        if (gameOver)
+        {
+            if (isChecked[0])
+                Raylib.DrawText("Black won!", boardOffset, Raylib.GetScreenHeight() / 3, 50, Color.BLACK);
+            if (isChecked[1])
+                Raylib.DrawText("White won!", boardOffset, Raylib.GetScreenHeight() / 3, 50, Color.BLACK);
+        }
+
 
         // Show current player
         if (currentPlayer == 1)
-            Raylib.DrawText("White's turn", boardOffset, Raylib.GetScreenHeight() / 3, 50, Color.BLACK);
+            Raylib.DrawText("White's turn", boardOffset, boardOffset, 50, Color.BLACK);
         else if (currentPlayer == 2)
-            Raylib.DrawText("Black's turn", boardOffset, Raylib.GetScreenHeight() / 3, 50, Color.BLACK);
+            Raylib.DrawText("Black's turn", boardOffset, boardOffset, 50, Color.BLACK);
 
         // Draw current round
         Raylib.DrawText("Round " + round, Raylib.GetScreenWidth() - boardPixelSize / 4, boardOffset, 45, Color.BLACK);
@@ -234,6 +236,18 @@ class Program
                 }
             }
         }
+    }
+    static Piece[,] ResetGame(Piece[,] Board, ref int currentPlayer, ref int round, ref List<Piece> allMoves, ref bool[] isChecked, ref bool gameOver)
+    {
+        Board = GenerateBoard(Board);
+        currentPlayer = 1;
+        gameOver = false;
+        allMoves.Clear();
+        isChecked[0] = false;
+        isChecked[1] = false;
+        round = 1;
+
+        return Board;
     }
     static Piece[,] GenerateBoard(Piece[,] Board)
     {
