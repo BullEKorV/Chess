@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 public class MoveConditions
 {
@@ -42,7 +43,7 @@ public class MoveConditions
         }
         return Board;
     }
-    public static Piece[,] SpecialPieceConditions(Piece selectedPiece, int currentPlayer, Piece[,] Board)
+    public static Piece[,] PawnToQueen(Piece selectedPiece, int currentPlayer, Piece[,] Board)
     {
         if (selectedPiece.y == 0 && selectedPiece.player == 1 && selectedPiece.pieceType == PieceType.Pawn) // Make player 1 pawn queen when reach top
             selectedPiece.pieceType = PieceType.Queen;
@@ -51,6 +52,62 @@ public class MoveConditions
 
         return Board;
     }
+    // public static Piece[,] SpecialMoveConditions(int currentPlayer, Piece[,] Board, List<Piece> allMoves)
+    // {
+    //     var findKing = allMoves.Find(x => x.pieceType == PieceType.King && x.player == currentPlayer);
+
+    //     var leftRookFind = allMoves.Find(x => x.pieceType == PieceType.Rook && x.player == currentPlayer && x.x == 0);
+
+    //     var rightRookFind = allMoves.Find(x => x.pieceType == PieceType.Rook && x.player == currentPlayer && x.x == Board.GetLength(0) - 1);
+
+
+    //     bool canMoveLeft = false;
+    //     bool canMoveRight = false;
+
+    //     if (findKing == null)
+    //     {
+    //         if (leftRookFind == null)
+    //         {
+    //             canMoveLeft = true;
+    //             for (int i = 1; i < 4; i++)
+    //             {
+    //                 if (currentPlayer == 1)
+    //                     if (Board[i, Board.GetLength(1) - 1].pieceType != PieceType.None) canMoveLeft = false;
+    //                 if (currentPlayer == 2)
+    //                     if (Board[i, 0].pieceType != PieceType.None) canMoveLeft = false;
+    //             }
+    //         }
+    //         if (rightRookFind == null)
+    //         {
+    //             canMoveRight = true;
+    //             for (int i = 5; i < Board.GetLength(0) - 1; i++)
+    //             {
+    //                 if (currentPlayer == 1)
+    //                     if (Board[i, Board.GetLength(1) - 1].pieceType != PieceType.None) canMoveRight = false;
+    //                 if (currentPlayer == 2)
+    //                     if (Board[i, 0].pieceType != PieceType.None) canMoveRight = false;
+    //             }
+    //         }
+    //     }
+    //     if (canMoveLeft == true)
+    //     {
+    //         if (currentPlayer == 1)
+    //             Board[0, Board.GetLength(1) - 1].legalMove = true;
+    //         if (currentPlayer == 2)
+    //             Board[0, 0].legalMove = true;
+    //     }
+    //     if (canMoveRight == true)
+    //     {
+    //         if (currentPlayer == 1)
+    //             Board[Board.GetLength(0) - 1, Board.GetLength(1) - 1].legalMove = true;
+    //         if (currentPlayer == 2)
+    //             Board[Board.GetLength(0) - 1, 0].legalMove = true;
+    //     }
+
+    //     Console.WriteLine(findKing);
+
+    //     return Board;
+    // }
     public static bool IsKingChecked(Piece[,] Board, int currentPlayer)
     {
         Piece king = null;

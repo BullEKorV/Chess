@@ -40,38 +40,42 @@ class Program
                 // Move piece if legal move
                 try
                 {
-                    if (CheckMousePos(Board, boardOffset).legalMove == true)
+                    if (CheckMousePos(Board, boardOffset) != null)
                     {
-                        isChecked[currentPlayer - 1] = false;
+                        if (CheckMousePos(Board, boardOffset).legalMove == true)
+                        {
+                            isChecked[currentPlayer - 1] = false;
 
-                        Board = MovePiece(selectedPiece, Board, CheckMousePos(Board, boardOffset), currentPlayer, allMoves, round);
+                            Board = MovePiece(selectedPiece, Board, CheckMousePos(Board, boardOffset), currentPlayer, allMoves, round);
 
-                        currentPlayer = NextPlayer(currentPlayer);
+                            currentPlayer = NextPlayer(currentPlayer);
 
-                        round++;
+                            round++;
 
-                        isChecked[currentPlayer - 1] = MoveConditions.IsKingChecked(Board, NextPlayer(currentPlayer));
+                            isChecked[currentPlayer - 1] = MoveConditions.IsKingChecked(Board, NextPlayer(currentPlayer));
+                        }
+                        else
+                        {
+                            selectedPiece = CheckMousePos(Board, boardOffset);
+                        }
+
+
+                        //Check and mark legal moves
+                        MoveConditions.ClearLegalMoves(Board);
+                        MoveConditions.CurrentLegalMoves(selectedPiece, Board, currentPlayer, true);
+
+                        // if (selectedPiece.pieceType == PieceType.King)
+                        //     MoveConditions.SpecialMoveConditions(currentPlayer, Board, allMoves);
                     }
-                    else
-                    {
-                        selectedPiece = CheckMousePos(Board, boardOffset);
-                    }
-
-
-                    //Check and mark legal moves
-                    MoveConditions.ClearLegalMoves(Board);
-                    MoveConditions.CurrentLegalMoves(selectedPiece, Board, currentPlayer, true);
                 }
                 catch (System.Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
             }
-            if (Raylib.IsKeyPressed(KeyboardKey.KEY_A))
-            {
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_A)) // Next player
                 currentPlayer = NextPlayer(currentPlayer);
-            }
-            if (Raylib.IsKeyPressed(KeyboardKey.KEY_B))
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_B)) // Go back step
             {
                 if (round > 1)
                 {
@@ -122,7 +126,7 @@ class Program
         Board[selectedPiece.x, selectedPiece.y].player = 0;
 
 
-        Board = MoveConditions.SpecialPieceConditions(newPos, currentPlayer, Board);
+        Board = MoveConditions.PawnToQueen(newPos, currentPlayer, Board);
 
         return Board;
     }
@@ -259,24 +263,18 @@ class Program
                 int player = 0;
                 if (y == 0)
                 {
-                    // player = 2;
-                    // if (x == 0 || x == 7) tempType = PieceType.Rook;
-                    // else if (x == 1 || x == 6) tempType = PieceType.Knight;
-                    // else if (x == 2 || x == 5) tempType = PieceType.Bishop;
-                    // else if (x == 3) tempType = PieceType.Queen;
-                    // else if (x == 4) tempType = PieceType.King;
-                    if (x == 4)
-                    {
-                        tempType = PieceType.King;
-                        player = 2;
-                    }
-
+                    player = 2;
+                    if (x == 0 || x == 7) tempType = PieceType.Rook;
+                    else if (x == 1 || x == 6) tempType = PieceType.Knight;
+                    else if (x == 2 || x == 5) tempType = PieceType.Bishop;
+                    else if (x == 3) tempType = PieceType.Queen;
+                    else if (x == 4) tempType = PieceType.King;
                 }
-                // else if (y == 1)
-                // {
-                //     tempType = PieceType.Pawn;
-                //     player = 2;
-                // }
+                else if (y == 1)
+                {
+                    tempType = PieceType.Pawn;
+                    player = 2;
+                }
                 if (y == Board.GetLength(1) - 1)
                 {
                     player = 1;
