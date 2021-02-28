@@ -43,7 +43,7 @@ public class MoveConditions
         }
         return Board;
     }
-    public static Piece[,] PawnToQueen(Piece selectedPiece, int currentPlayer, Piece[,] Board)
+    public static Piece[,] Promotion(Piece selectedPiece, int currentPlayer, Piece[,] Board)
     {
         if (selectedPiece.y == 0 && selectedPiece.player == 1 && selectedPiece.pieceType == PieceType.Pawn) // Make player 1 pawn queen when reach top
             selectedPiece.pieceType = PieceType.Queen;
@@ -52,7 +52,7 @@ public class MoveConditions
 
         return Board;
     }
-    // public static Piece[,] SpecialMoveConditions(int currentPlayer, Piece[,] Board, List<Piece> allMoves)
+    // public static Piece[,] EnPassantCheck(int currentPlayer, Piece[,] Board, List<Piece> allMoves)
     // {
     //     var findKing = allMoves.Find(x => x.pieceType == PieceType.King && x.player == currentPlayer);
 

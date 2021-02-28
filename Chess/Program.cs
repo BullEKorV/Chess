@@ -65,7 +65,7 @@ class Program
                         MoveConditions.CurrentLegalMoves(selectedPiece, Board, currentPlayer, true);
 
                         // if (selectedPiece.pieceType == PieceType.King)
-                        //     MoveConditions.SpecialMoveConditions(currentPlayer, Board, allMoves);
+                        //     MoveConditions.EnPassantCheck(currentPlayer, Board, allMoves);
                     }
                 }
                 catch (System.Exception e)
@@ -73,8 +73,8 @@ class Program
                     Console.WriteLine(e.Message);
                 }
             }
-            if (Raylib.IsKeyPressed(KeyboardKey.KEY_A)) // Next player
-                currentPlayer = NextPlayer(currentPlayer);
+            // if (Raylib.IsKeyPressed(KeyboardKey.KEY_A)) // Next player
+            //     currentPlayer = NextPlayer(currentPlayer);
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_B)) // Go back step
             {
                 if (round > 1)
@@ -93,7 +93,7 @@ class Program
                 Board = ResetGame(Board, ref currentPlayer, ref round, ref allMoves, ref isChecked, ref gameOver);
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_H)) // Activate or deactivate tips
                 hintsActivated = !hintsActivated;
-            if (Raylib.IsKeyPressed(KeyboardKey.KEY_Q)) // Reset game
+            if (Raylib.IsKeyPressed(KeyboardKey.KEY_Q)) // Quit game
                 gameActive = false;
 
             Raylib.EndDrawing();
@@ -126,7 +126,7 @@ class Program
         Board[selectedPiece.x, selectedPiece.y].player = 0;
 
 
-        Board = MoveConditions.PawnToQueen(newPos, currentPlayer, Board);
+        Board = MoveConditions.Promotion(newPos, currentPlayer, Board);
 
         return Board;
     }
@@ -169,33 +169,37 @@ class Program
             }
         }
 
+        // Write instructions  
+        if (round < 3)
+            Raylib.DrawText("Press \"H\"\nto toggle guide\n\nPress \"B\"\nto go back\na move", Raylib.GetScreenWidth() - boardPixelSize / 3 - (boardPixelSize / 8), Raylib.GetScreenHeight() / 3, 40, Color.BLACK);
+
         // Draw check message
         if (!gameOver)
         {
             if (isChecked[0])
-                Raylib.DrawText("White check!", boardOffset, Raylib.GetScreenHeight() / 3, 35, Color.BLACK);
+                Raylib.DrawText("Check!\nPress \"G\" \nif checkmate", boardOffset / 2, Raylib.GetScreenHeight() / 3, 60, Color.BLACK);
             else if (isChecked[1])
-                Raylib.DrawText("Black check", boardOffset, Raylib.GetScreenHeight() / 3, 35, Color.BLACK);
+                Raylib.DrawText("Check!\nPress \"G\" \nif checkmate", boardOffset / 2, Raylib.GetScreenHeight() / 3, 60, Color.BLACK);
         }
 
         // Draw checkMate message
         if (gameOver)
         {
             if (isChecked[0])
-                Raylib.DrawText("Black won!", boardOffset, Raylib.GetScreenHeight() / 3, 50, Color.BLACK);
+                Raylib.DrawText("Checkmate!\nPress \"R\"\nto restart", boardOffset / 2, Raylib.GetScreenHeight() / 3, 60, Color.BLACK);
             if (isChecked[1])
-                Raylib.DrawText("White won!", boardOffset, Raylib.GetScreenHeight() / 3, 50, Color.BLACK);
+                Raylib.DrawText("Checkmate!\nPress \"R\"\nto restart", boardOffset / 2, Raylib.GetScreenHeight() / 3, 60, Color.BLACK);
         }
 
 
         // Show current player
         if (currentPlayer == 1)
-            Raylib.DrawText("White's turn", boardOffset, boardOffset, 50, Color.BLACK);
+            Raylib.DrawText("White's turn", boardOffset / 2, boardOffset, 60, Color.BLACK);
         else if (currentPlayer == 2)
-            Raylib.DrawText("Black's turn", boardOffset, boardOffset, 50, Color.BLACK);
+            Raylib.DrawText("Black's turn", boardOffset / 2, boardOffset, 60, Color.BLACK);
 
         // Draw current round
-        Raylib.DrawText("Round " + round, Raylib.GetScreenWidth() - boardPixelSize / 3, boardOffset, 45, Color.BLACK);
+        Raylib.DrawText("Round " + round, Raylib.GetScreenWidth() - boardPixelSize / 3 - (boardPixelSize / 8), boardOffset, 60, Color.BLACK);
 
         // Draw letters and numbers around board
         for (int x = 0; x < Board.GetLength(0); x++)
@@ -210,7 +214,6 @@ class Program
             Raylib.DrawText((8 - y).ToString(), (Raylib.GetScreenWidth() - boardPixelSize) / 2 + boardPixelSize + (boardPixelSize / 8) / 3, boardOffset + y * (boardPixelSize / 8) + (boardPixelSize / 8) / 3, 40, Color.BLACK);
         }
 
-        // Draw dead pieces TO DO
 
         // Draw pieces
         for (int x = 0; x < Board.GetLength(0); x++)
@@ -221,9 +224,9 @@ class Program
                 {
                     // string pieceText = Board[x, y].pieceType.ToString();
                     // var color = Color.BLUE;
-                    // if (Board[x, y].player == 1) color = Color.BEIGE;
-                    // else if (Board[x, y].player == 2) color = Color.GRAY;
-                    // Raylib.DrawText(pieceText.ToString(), boardOffset + x * (boardPixelSize / 8) + x, boardOffset + y * (boardPixelSize / 8) + y, 25, color);
+                    // if (Board[x, y].player == 1) color = Color.WHITE;
+                    // else if (Board[x, y].player == 2) color = Color.BLACK;
+                    // Raylib.DrawText(pieceText.ToString(), (Raylib.GetScreenWidth() - boardPixelSize) / 2 + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8) + y, 25, color);
 
                     string fileName = "";
                     if (Board[x, y].pieceType != PieceType.Knight)
