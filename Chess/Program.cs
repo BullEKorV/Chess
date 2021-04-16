@@ -28,13 +28,17 @@ class Program
         Dictionary<String, Texture2D> Textures = LoadTextures();
 
         //Run game
-        bool gameActive = true;
-        while (gameActive)
+        while (!Raylib.WindowShouldClose())
         {
+            // Render frame
             Raylib.BeginDrawing();
             Raylib.ClearBackground(Color.WHITE);
 
             DrawBoard(Board, boardOffset, Textures, isChecked, round, hintsActivated, currentPlayer, gameOver);
+
+            Raylib.EndDrawing();
+
+            // Game logic code
             if (Raylib.IsMouseButtonPressed(MouseButton.MOUSE_LEFT_BUTTON) && gameOver == false)
             {
                 // Move piece if legal move
@@ -73,6 +77,7 @@ class Program
                     Console.WriteLine(e.Message);
                 }
             }
+            // Special key commands
             // if (Raylib.IsKeyPressed(KeyboardKey.KEY_A)) // Next player
             //     currentPlayer = NextPlayer(currentPlayer);
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_B)) // Go back step
@@ -81,7 +86,7 @@ class Program
                 {
                     Board = GoBackStep(Board, allMoves);
                     round--;
-                    isChecked[currentPlayer - 1] = false;
+                    isChecked[currentPlayer - 1] = MoveConditions.IsKingChecked(Board, currentPlayer);
                     gameOver = false;
                     currentPlayer = NextPlayer(currentPlayer);
                     MoveConditions.ClearLegalMoves(Board);
@@ -94,9 +99,7 @@ class Program
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_H)) // Activate or deactivate tips
                 hintsActivated = !hintsActivated;
             if (Raylib.IsKeyPressed(KeyboardKey.KEY_Q)) // Quit game
-                gameActive = false;
-
-            Raylib.EndDrawing();
+                Raylib.CloseWindow();
         }
     }
     static Piece[,] GoBackStep(Piece[,] Board, List<Piece> allMoves)
