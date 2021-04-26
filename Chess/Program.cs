@@ -167,7 +167,7 @@ class Program
                     Raylib.DrawRectangle((Raylib.GetScreenWidth() - boardPixelSize) / 2 + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.BEIGE);
                 if (Board[x, y].legalMove == true && hintsActivated)
                 {
-                    Raylib.DrawRectangle((Raylib.GetScreenWidth() - boardPixelSize) / 2 + x * (boardPixelSize / 8), boardOffset + y * (boardPixelSize / 8), boardPixelSize / 8, boardPixelSize / 8, Color.DARKGREEN);
+                    Raylib.DrawRectangle((Raylib.GetScreenWidth() - boardPixelSize) / 2 + x * (boardPixelSize / 8) + 10, boardOffset + y * (boardPixelSize / 8) + 10, boardPixelSize / 8 - 20, boardPixelSize / 8 - 20, new Color(0, 130, 20, 190));
                 }
             }
         }
